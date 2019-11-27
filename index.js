@@ -6,6 +6,7 @@ const pgp = require('pg-promise');
 const dbConfig = require('./lib/database');
 const rabbitConfig = require('./lib/rabbit');
 const consumersConfig = require('./lib/consumers');
+const probabilityConfig = require('./lib/probability');
 
 (async() => {
     dotenv.config();
@@ -13,7 +14,9 @@ const consumersConfig = require('./lib/consumers');
     const db = dbConfig(bluebird, pgp);
     const rabbit = await rabbitConfig(amqplib);
 
-    await consumersConfig(rabbit.channel);
+    const probability = probabilityConfig(db);
+
+    await consumersConfig(rabbit.channel, probability);
 })().catch(err => {
     console.error(err);
 });
